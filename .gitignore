@@ -1,0 +1,12 @@
+__pycache__
+
+.venv
+
+.DS_Store
+
+# 文件夹
+eggggo/logs
+eggggo/wallpaper/scripts/pics
+
+# 
+pokemon-dataset-zh
