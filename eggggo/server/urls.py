@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
+
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 urlpatterns = [
@@ -25,6 +27,10 @@ urlpatterns = [
     path('pokemon_library/', include('pokemon_library.urls')),
     path('pokemon_wallpaper/', include('pokemon_wallpaper.urls')),
     path('wallpaper/', include('wallpaper.urls')),
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/black/', TokenBlacklistView.as_view(), name='token_blacklist'),  # 注销操作将token放入黑名单无法再使用
 
     # # drf-spectacular，只能在该处配置，不推荐使用
     # path('wallpaper/spe-schema/', SpectacularAPIView.as_view(), name='wallpaper-spe-schema'),

@@ -19,4 +19,8 @@ def main():
 
 
 if __name__ == '__main__':
+    # 修改默认端口 8000 为 9000
+    # from django.core.management.commands.runserver import Command
+    # Command.default_addr = '0.0.0.0'
+    # Command.default_port = '9000'
     main()

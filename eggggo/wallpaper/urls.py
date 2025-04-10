@@ -8,6 +8,9 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+from pathlib import Path
+from importlib import import_module
+
 
 # 设置API文档的schema视图
 schema_view = get_schema_view(
@@ -22,12 +25,31 @@ schema_view = get_schema_view(
     public=True,
 )
 
+# 静态注册路由，不灵活
 router = routers.DefaultRouter()
-router.register(r'wall', views.WallView, basename="wall")
-router.register(r'classify', views.ClassifyView, basename="classify")
-router.register(r'banner', views.BannerView, basename="banner")
-router.register(r'notice', views.NoticeView, basename="notice")
+# router.register(r'wall', views.WallView, basename="wall")
+# router.register(r'classify', views.ClassifyView, basename="classify")
+# router.register(r'banner', views.BannerView, basename="banner")
+# router.register(r'notice', views.NoticeView, basename="notice")
 
+
+def router_register(p: Path, folder="api"):
+    name = p.stem
+    file = import_module(f'.{folder}.{name}', package=__package__)
+    module = getattr(file, 'ApiModelView', None)
+    # print(name, file, module)
+    if module:
+        router.register(name, module, basename=name)
+        print(f"=> router register {__package__}.{folder}.{name}")
+
+
+# 动态注册路由
+apis_path = Path(__file__).resolve().parent.joinpath("api")
+for p in apis_path.iterdir():
+    # 进行文件名等逻辑判断，过滤不需要注册的路由
+    if not p.is_file():
+        continue
+    router_register(p)
 
 app_name = 'wallpaper'
 urlpatterns = [

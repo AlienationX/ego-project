@@ -1,5 +1,11 @@
-from rest_framework.serializers import ModelSerializer
-from .models import Wall, Classify, Notice, Banner
+from rest_framework.serializers import ModelSerializer, CharField, PrimaryKeyRelatedField
+from .models import Wall, Classify, Notice, Banner, Application
+
+
+class ApplicationSerializer(ModelSerializer):
+    class Meta:
+        model = Application
+        fields = "__all__"
 
 
 class ClassifySerializer(ModelSerializer):
@@ -9,10 +15,11 @@ class ClassifySerializer(ModelSerializer):
 
 
 class WallSerializer(ModelSerializer):
+    classify_id = PrimaryKeyRelatedField(source="classify", read_only=True)  # 显示外键表的主键值id
     class Meta:
         model = Wall
-        fields = "__all__"
-
+        # fields = "__all__"
+        exclude = ["classify"]
 
 class NoticeSerializer(ModelSerializer):
     class Meta:

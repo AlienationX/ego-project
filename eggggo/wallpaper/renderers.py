@@ -24,16 +24,16 @@ class CustomJSONRenderer(JSONRenderer):
                 "code": code,
                 "message": message,
                 "pagination": data["pagination"],    # 分页信息
-                # "data": data["data"]               # 分页数据
-                "data": data["data"] if code == status.HTTP_200_OK else [],              # 如果报错返回空列表
+                "data": data["data"],              # 分页数据
+                # "data": data["data"] if code == status.HTTP_200_OK else [],              # 如果报错返回空列表
                 "duration": f"{duration:.2f}s",
             }
         else:
             formatted_data = {
                 "code": code,
                 "message": message,
-                # "data": data  # 非分页数据
-                "data": data if code == status.HTTP_200_OK else [],              # 如果报错返回空列表
+                "data": data,  # 非分页数据
+                # "data": data if code == status.HTTP_200_OK else [],              # 如果报错返回空列表
                 "duration": f"{duration:.2f}s",
             }
 

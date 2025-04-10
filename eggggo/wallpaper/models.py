@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+# from django.db.models.functions import Now
+
 
 # 1.生成模型
 # python manage.py makemigrations polls
@@ -8,19 +10,25 @@ from django.utils import timezone
 # python manage.py sqlmigrate polls 0001
 
 # 3.执行sql语句
-# python manage.py migrate
+# python manage.py migrate polls
 
 # 4.加载初始化数据，覆盖已有数据
 # python manage.py loaddata polls/initial_data
 
 
-class Appilcation(models.Model):
+# 关联关系（如 ForeignKey， OneToOneField， 或 ManyToManyField）
+
+class Application(models.Model):
     """
     wallpaper: 本我壁纸-ego
     pokemon: 宝可梦壁纸-pokemon
     """
     name = models.CharField(max_length=60, unique=True, verbose_name="应用名称")
+    logo_url = models.CharField(max_length=255, verbose_name="logo图片url", null=True)
     enable = models.BooleanField(default=True, verbose_name="状态")
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = "app应用"
@@ -34,6 +42,7 @@ class Classify(models.Model):
     select = models.BooleanField(default=False, verbose_name="是否首页推荐")
     enable = models.BooleanField(default=True, verbose_name="是否启用")  # is_active
     created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")  # auto_now_add=True auto_now=True
+    # default 是给模型设置默认值，db_default 是给数据库设置默认值，推荐
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
     _id = models.CharField(max_length=60, verbose_name="分类id", null=True)  # 闲虾米壁纸数据的classid
 
@@ -46,32 +55,24 @@ class Classify(models.Model):
 
 
 class Wall(models.Model):
-    class_id = models.ForeignKey(Classify, on_delete=models.SET_NULL, null=True, verbose_name="分类")
     # small_picurl = models.CharField(max_length=255, verbose_name="图片缩略图地址")
     picurl = models.CharField(max_length=255, verbose_name="图片地址")
     description = models.CharField(max_length=255, null=True, verbose_name="描述")
+    # 这个字段其实可以设计成 ManyToManyField，其实就是列表存储，使用add方法添加
     tabs = models.CharField(max_length=200, null=True, verbose_name="标签")
     score = models.DecimalField(max_digits=10, decimal_places=1, null=True, verbose_name="图片分数")
     publisher = models.CharField(max_length=60, default="unknown", verbose_name="发布者")
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
+    classify = models.ForeignKey(Classify, on_delete=models.SET_NULL, null=True,
+                                 verbose_name="分类")  # 外键写表名即可，生成的字段默认会增加_id
     _id = models.CharField(max_length=60, verbose_name="图片id", null=True)  # 闲虾米壁纸数据的wallid
     _classid = models.CharField(max_length=60, verbose_name="分类id", null=True)  # 闲虾米壁纸数据的classid，遗留问题
 
     class Meta:
         verbose_name = "壁纸信息"
         verbose_name_plural = "壁纸详细信息"
-
-
-class Rate(models.Model):
-    user_id = models.CharField(max_length=100, verbose_name="用户id")
-    wall_id = models.ForeignKey(Wall, on_delete=models.SET_NULL, null=True, verbose_name="壁纸id")
-    pic_score = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="壁纸分数")
-    updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
-
-    class Meta:
-        verbose_name_plural = "用户评分"
 
 
 class Notice(models.Model):
@@ -106,18 +107,8 @@ class Banner(models.Model):
         verbose_name_plural = "首页横幅_plural"
 
 
-class Access(models.Model):
-    ip = models.CharField(max_length=100, verbose_name="ip地址")
-    username = models.CharField(max_length=100, verbose_name="用户名")
-    source = models.CharField(max_length=100, verbose_name="来源")
-    access_time = models.DateTimeField(default=timezone.now, verbose_name="访问时间")
-
-    class Meta:
-        verbose_name_plural = "请求访问信息"
-
-
 class User(models.Model):
-    username = models.CharField(max_length=100, verbose_name="用户名")
+    name = models.CharField(max_length=100, verbose_name="用户名")
     address = models.CharField(max_length=60, verbose_name="归属地")
     ip = models.CharField(max_length=100, verbose_name="ip地址")
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
@@ -128,6 +119,16 @@ class User(models.Model):
         verbose_name = "用户信息"
 
 
+class Rate(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="用户id")
+    wall = models.ForeignKey(Wall, on_delete=models.SET_NULL, null=True, verbose_name="壁纸id")
+    pic_score = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="壁纸分数")
+    updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
+
+    class Meta:
+        verbose_name_plural = "用户评分"
+
+
 class PageView(models.Model):
     url = models.CharField(max_length=255, verbose_name="url地址")
     pv = models.IntegerField(default=0, verbose_name="页面访问量")
@@ -135,3 +136,13 @@ class PageView(models.Model):
     class Meta:
         verbose_name = "页面访问量"
         verbose_name_plural = "页面访问量统计"
+
+
+class Access(models.Model):
+    ip = models.CharField(max_length=100, verbose_name="ip地址")
+    username = models.CharField(max_length=100, verbose_name="用户名")
+    source = models.CharField(max_length=100, verbose_name="来源")
+    access_time = models.DateTimeField(default=timezone.now, verbose_name="访问时间")
+
+    class Meta:
+        verbose_name_plural = "请求访问信息"

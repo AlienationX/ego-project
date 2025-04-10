@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,11 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_simplejwt',                  # jwt用户认证
+    'rest_framework_simplejwt.token_blacklist',  # jwt黑名单功能，必须添加此行，同时需要 makemigrations 和 migrate，生成2张token_blacklist相关表
     'corsheaders',             # 处理跨域
     'drf_yasg',
     'drf_spectacular',         # 接口文档 swagger
     'drf_spectacular_sidecar', # 接口文档 swagger-ui
-
 
     'pokemon_library',  # 注册图鉴应用
     'pokemon_wallpaper',  #  注册壁纸应用
@@ -159,9 +161,32 @@ LOGIN_URL = '/pokemon_wallpaper/login/'
 # ######################## rest_framework 配置
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # 可选其他认证方式（如Token 和 Session认证）
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',  # Basic 认证（可选）​​敏感信息隔离​​：Basic 认证仅限测试环境使用，生产环境推荐使用 JWT。
+    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated'  # 默认需要认证
+    # ]
+}
+
+# ######################## jwt 用户认证配置
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),   # 访问令牌有效期
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),      # 刷新令牌有效期
+    'ROTATE_REFRESH_TOKENS': True,                    # 刷新时生成新 refresh token
+    'BLACKLIST_AFTER_ROTATION': True,                 # 刷新后废弃旧 refresh token
+    'UPDATE_LAST_LOGIN': True,                       # 登录时是否更新最后登录时间
+    'ALGORITHM': 'HS256',                             # 加密算法
+    'SIGNING_KEY': SECRET_KEY,                        # 签名密钥（从 settings 中获取）
+    'AUTH_HEADER_TYPES': ('Bearer',),                 # 请求头格式（默认 Bearer）
 }
 
 # ######################## drf-spectacular 配置
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Wallpaper API',
     'DESCRIPTION': 'Your project description',
