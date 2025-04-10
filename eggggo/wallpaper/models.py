@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
 # from django.db.models.functions import Now
 
@@ -65,8 +66,7 @@ class Wall(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
-    classify = models.ForeignKey(Classify, on_delete=models.SET_NULL, null=True,
-                                 verbose_name="分类")  # 外键写表名即可，生成的字段默认会增加_id
+    classify = models.ForeignKey(Classify, on_delete=models.PROTECT, verbose_name="分类")  # 外键写表名即可，生成的字段默认会增加_id
     _id = models.CharField(max_length=60, verbose_name="图片id", null=True)  # 闲虾米壁纸数据的wallid
     _classid = models.CharField(max_length=60, verbose_name="分类id", null=True)  # 闲虾米壁纸数据的classid，遗留问题
 
@@ -107,27 +107,28 @@ class Banner(models.Model):
         verbose_name_plural = "首页横幅_plural"
 
 
-class User(models.Model):
-    name = models.CharField(max_length=100, verbose_name="用户名")
-    address = models.CharField(max_length=60, verbose_name="归属地")
-    ip = models.CharField(max_length=100, verbose_name="ip地址")
-    is_active = models.BooleanField(default=True, verbose_name="是否启用")
-    created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='profile')
+    name = models.CharField(max_length=60, verbose_name="用户名")
+    email = models.CharField(max_length=60, verbose_name="邮箱地址")
+    phone = models.CharField(max_length=20, verbose_name="电话")
+    source = models.CharField(max_length=60, verbose_name="来源")
+    ip = models.CharField(max_length=60, verbose_name="ip地址")
+    region = models.CharField(max_length=60, verbose_name="行政区省市县")
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
 
     class Meta:
-        verbose_name = "用户信息"
+        verbose_name = "用户资料"
 
 
 class Rate(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="用户id")
-    wall = models.ForeignKey(Wall, on_delete=models.SET_NULL, null=True, verbose_name="壁纸id")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, verbose_name="用户id")
+    wall = models.ForeignKey(Wall, on_delete=models.DO_NOTHING, null=True, verbose_name="壁纸id")
     pic_score = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="壁纸分数")
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
 
     class Meta:
         verbose_name_plural = "用户评分"
-
 
 class PageView(models.Model):
     url = models.CharField(max_length=255, verbose_name="url地址")

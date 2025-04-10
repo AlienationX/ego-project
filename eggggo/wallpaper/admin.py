@@ -3,7 +3,7 @@ from django.utils.html import format_html
 
 
 # Register your models here.
-from .models import Classify, Wall, Notice, Rate, User, Banner, Access, Application
+from .models import Classify, Wall, Notice, Rate, UserProfile, Banner, Access, Application
 
 
 class ClassifyAdmin(admin.ModelAdmin):
@@ -86,5 +86,5 @@ admin.site.register(Wall, WallAdmin)
 admin.site.register(Rate)
 admin.site.register(Banner, BannerAdmin)
 admin.site.register(Access)
-admin.site.register(User)
+admin.site.register(UserProfile)
 admin.site.register(Application)

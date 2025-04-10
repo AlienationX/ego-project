@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class ApiModelView(ListModelMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = Wall.objects.all()
+    queryset = Wall.objects.select_related('classify').all()
     serializer_class = WallSerializer
     pagination_class = CustomPageNumberPagination  # 使用自定义分页类
     renderer_classes = [CustomJSONRenderer]        # 使用自定义渲染器，额外统一增加code和message字段。默认是JSONRenderer
