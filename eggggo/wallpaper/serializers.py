@@ -16,6 +16,7 @@ class ClassifySerializer(ModelSerializer):
 
 class WallSerializer(ModelSerializer):
     classify_id = PrimaryKeyRelatedField(source="classify", read_only=True)  # 显示外键表的主键值id
+    classify_name = CharField(source="classify.name", read_only=True)
     class Meta:
         model = Wall
         # fields = "__all__"

@@ -3,7 +3,7 @@ from django.utils.html import format_html
 
 
 # Register your models here.
-from .models import Classify, Wall, Notice, Rate, UserProfile, Banner, Access, Application
+from .models import Classify, Wall, Notice, Rate, Profile, Banner, Access, Application
 
 
 class ClassifyAdmin(admin.ModelAdmin):
@@ -66,9 +66,9 @@ class BannerAdmin(admin.ModelAdmin):
 
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'publish_date')
+    list_display = ('id', 'title', 'author', 'select', 'view_count', 'publish_date')
 
-    fields = ('title', 'content', 'html_preview', 'author', 'article_status', 'publish_date', 'view_count')
+    fields = ('title', 'content', 'html_preview', 'author', 'select', 'article_status', 'publish_date', 'view_count')
 
     readonly_fields = ('html_preview',)
     # 编辑页完整预览（带安全限制）
@@ -86,5 +86,5 @@ admin.site.register(Wall, WallAdmin)
 admin.site.register(Rate)
 admin.site.register(Banner, BannerAdmin)
 admin.site.register(Access)
-admin.site.register(UserProfile)
+admin.site.register(Profile)
 admin.site.register(Application)

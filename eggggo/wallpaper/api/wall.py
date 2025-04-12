@@ -43,7 +43,7 @@ class ApiModelView(ListModelMixin, RetrieveModelMixin, GenericViewSet):
         # detail=True 表示这个动作是针对单个对象的，如果设置为 False，则表示这个动作是针对所有对象的。
 
         # 获取所有的对象，且classify.enable为True的数据
-        queryset = self.get_queryset().filter( Q(classify__enable=True) )
+        queryset = self.get_queryset().filter(Q(classify__enable=True))
 
         # 方法 1：使用 order_by('?') 来随机排序，返回前 9 条数据
         random_queryset = queryset.order_by('?')[:9]
@@ -60,8 +60,8 @@ class ApiModelView(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     def search(self, request):
         # detail=True 表示这个动作是针对单个对象的，如果设置为 False，则表示这个动作是针对所有对象的。
 
-        kw = self.request.query_params.get("kw")
-        if not kw:
+        keyword = self.request.query_params.get("keyword")
+        if not keyword:
             # 如果kw为空则返回空结果
             return Response([])
 
@@ -94,7 +94,7 @@ class ApiModelView(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
         # 进行过滤，description 字段包含kw关键字，或者 tabs字段包含kw关键字
         # search_fields = ["description", "tabs", "classify.enable"]
-        queryset = queryset.filter( Q(classify__enable=True) & (Q(description__contains=kw) | Q(tabs__contains=kw)) )
+        queryset = queryset.filter(Q(classify__enable=True) & (Q(description__contains=keyword) | Q(tabs__contains=keyword)))
 
         # DRF的ModelViewSet在默认的list、retrieve等方法中会自动处理分页，但对于自定义的action，开发者需要手动集成分页逻辑。
         # 手动分页处理，如果存在分页器类，且数据量大于分页数则显示分页信息

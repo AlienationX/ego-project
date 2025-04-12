@@ -25,7 +25,7 @@ class Application(models.Model):
     pokemon: 宝可梦壁纸-pokemon
     """
     name = models.CharField(max_length=60, unique=True, verbose_name="应用名称")
-    logo_url = models.CharField(max_length=255, verbose_name="logo图片url", null=True)
+    logo_url = models.CharField(max_length=255, verbose_name="logo图片url", blank=True, null=True)
     enable = models.BooleanField(default=True, verbose_name="状态")
 
     def __str__(self):
@@ -45,7 +45,7 @@ class Classify(models.Model):
     created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")  # auto_now_add=True auto_now=True
     # default 是给模型设置默认值，db_default 是给数据库设置默认值，推荐
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
-    _id = models.CharField(max_length=60, verbose_name="分类id", null=True)  # 闲虾米壁纸数据的classid
+    _id = models.CharField(max_length=60, verbose_name="分类id", blank=True, null=True)  # 闲虾米壁纸数据的classid
 
     def __str__(self):
         return self.name
@@ -58,17 +58,17 @@ class Classify(models.Model):
 class Wall(models.Model):
     # small_picurl = models.CharField(max_length=255, verbose_name="图片缩略图地址")
     picurl = models.CharField(max_length=255, verbose_name="图片地址")
-    description = models.CharField(max_length=255, null=True, verbose_name="描述")
+    description = models.CharField(max_length=255, verbose_name="描述", blank=True, null=True)
     # 这个字段其实可以设计成 ManyToManyField，其实就是列表存储，使用add方法添加
-    tabs = models.CharField(max_length=200, null=True, verbose_name="标签")
-    score = models.DecimalField(max_digits=10, decimal_places=1, null=True, verbose_name="图片分数")
+    tabs = models.CharField(max_length=200, verbose_name="标签", blank=True, null=True)
+    score = models.DecimalField(max_digits=10, decimal_places=1, verbose_name="图片分数", blank=True, null=True)
     publisher = models.CharField(max_length=60, default="unknown", verbose_name="发布者")
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
     classify = models.ForeignKey(Classify, on_delete=models.PROTECT, verbose_name="分类")  # 外键写表名即可，生成的字段默认会增加_id
-    _id = models.CharField(max_length=60, verbose_name="图片id", null=True)  # 闲虾米壁纸数据的wallid
-    _classid = models.CharField(max_length=60, verbose_name="分类id", null=True)  # 闲虾米壁纸数据的classid，遗留问题
+    _id = models.CharField(max_length=60, verbose_name="图片id", blank=True, null=True)  # 闲虾米壁纸数据的wallid
+    _classid = models.CharField(max_length=60, verbose_name="分类id", blank=True, null=True)  # 闲虾米壁纸数据的classid，遗留问题
 
     class Meta:
         verbose_name = "壁纸信息"
@@ -78,6 +78,7 @@ class Wall(models.Model):
 class Notice(models.Model):
     title = models.CharField(max_length=200, verbose_name="公告标题")
     content = models.TextField(verbose_name="公告详情")
+    select = models.BooleanField(default=False, verbose_name="是否置顶")
     author = models.CharField(max_length=60, verbose_name="发布者")
     article_status = models.BooleanField(default=True, verbose_name="公告状态")
     publish_date = models.DateTimeField(default=timezone.now, verbose_name="发布时间")
@@ -95,7 +96,7 @@ class Banner(models.Model):
     sort = models.IntegerField(verbose_name="排序字段")
     picurl = models.CharField(max_length=255, verbose_name="缩略图")
     target = models.CharField(max_length=60, verbose_name="跳转方式，默认：self，外站：miniProgram")
-    appid = models.CharField(max_length=100, verbose_name="外部小程序的app-id")
+    appid = models.CharField(max_length=100, verbose_name="外部小程序的app-id", blank=True, null=True)
     enable = models.BooleanField(default=True, verbose_name="是否启用")  # is_active
     created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")
 
@@ -107,18 +108,18 @@ class Banner(models.Model):
         verbose_name_plural = "首页横幅_plural"
 
 
-class UserProfile(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='profile')
     name = models.CharField(max_length=60, verbose_name="用户名")
-    email = models.CharField(max_length=60, verbose_name="邮箱地址")
-    phone = models.CharField(max_length=20, verbose_name="电话")
+    email = models.CharField(max_length=60, verbose_name="邮箱地址", blank=True, null=True)
+    phone = models.CharField(max_length=20, verbose_name="电话", blank=True, null=True)
     source = models.CharField(max_length=60, verbose_name="来源")
     ip = models.CharField(max_length=60, verbose_name="ip地址")
-    region = models.CharField(max_length=60, verbose_name="行政区省市县")
+    region = models.CharField(max_length=60, verbose_name="行政区省市县", blank=True, null=True)
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="更新时间")
 
     class Meta:
-        verbose_name = "用户资料"
+        verbose_name = "用户个人信息"
 
 
 class Rate(models.Model):

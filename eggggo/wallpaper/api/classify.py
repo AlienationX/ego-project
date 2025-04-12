@@ -20,7 +20,7 @@ class ApiModelView(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
         # 获取所有数据
         # queryset = Wall.objects.all()
-        queryset = self.queryset
+        queryset = self.queryset.filter(enable=True)
 
         # 如果 select 参数存在，则过滤查询集
         if select:
