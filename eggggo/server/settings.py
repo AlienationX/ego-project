@@ -200,12 +200,15 @@ SPECTACULAR_SETTINGS = {
 
 # ######################## 跨域配置
 
-# CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # 前端开发服务器地址
-    # "http://127.0.0.1:3000",
-    "https://your-production-domain.com"  # 生产环境域名
-]
+# 该配置是django的配置，默认是空，主要是控制postman这种请求，生产环境也需要设置成前端和测试访问。跨域是控制前端浏览器的请求
+ALLOWED_HOSTS = ["*"]
+
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",  # 前端开发服务器地址
+#     # "http://127.0.0.1:3000",
+#     "https://your-production-domain.com"  # 生产环境域名
+# ]
 
 # 允许携带 Cookie（如果需要）
 CORS_ALLOW_CREDENTIALS = True
